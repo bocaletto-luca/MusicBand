@@ -3,7 +3,7 @@
 # StudioBand.sh v1.0.0
 # Terminal-based manager for audio & music-production applications
 # Compatible with Debian/Ubuntu – clean ASCII UI (whiptail)
-#
+# Language: English
 # Author: Luca Bocaletto
 # License: GPLv3
 # Date: 2025-08-02
