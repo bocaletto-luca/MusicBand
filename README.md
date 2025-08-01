@@ -1,4 +1,4 @@
-# StudioBand
+# Studio Band
 #### Author: Bocaletto Luca
 
 StudioBand is a professional, terminal-based application manager for audio and music production on Debian/Ubuntu. With a clean ASCII UI powered by `whiptail`, you can install, remove (with “keep config” or full purge), inspect, and launch your favorite DAWs, synths, players and CLI utilities—all from one script.
