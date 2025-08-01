@@ -24,6 +24,7 @@ StudioBand is a professional, terminal-based application manager for audio and m
 - Launch multiple installed apps in parallel from a checklist menu  
 - Extendable “custom apps” system—add any APT package + launch command  
 - Persist settings and custom entries under `~/.studioband/` for future sessions  
+- Language: English, Italian.
 
 ---
 
