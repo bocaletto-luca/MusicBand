@@ -1,119 +1,92 @@
 #!/usr/bin/env bash
 #
-# StudioBand.sh v0.9.1
-# Gestore terminale per applicazioni audio/music production
-# Compatibile Debian/Ubuntu – interfaccia ASCII pulita e senza artefatti
+# StudioBand.sh v1.0.0
+# Terminal-based manager for audio & music-production applications
+# Compatible with Debian/Ubuntu – clean ASCII UI (whiptail)
 #
-# Autore: Bocaletto Luca
-# License: GPL
-# Data: 2025-08-02
+# Author: Luca Bocaletto
+# License: GPLv3
+# Date: 2025-08-02
 #
 
 set -euo pipefail
 IFS=$'\n\t'
 
-# forziamo l’uso di bordi ASCII classici (evitiamo glitch con ACS Unicode)
+# Force ASCII borders in whiptail (disable Unicode ACS)
 export NCURSES_NO_UTF8_ACS=1
 
-# Versione
-readonly VERSION="1.0.1"
+# Script version
+readonly VERSION="1.0.0"
 
-# Directory e file di configurazione
+# Configuration directory & custom apps file
 readonly CONFIG_DIR="$HOME/.studioband"
 readonly CUSTOM_APPS_FILE="$CONFIG_DIR/apps.custom"
 
-# Controllo prerequisiti
+# Ensure whiptail is installed
 if ! command -v whiptail >/dev/null 2>&1; then
-  echo "Errore: whiptail non installato."
-  echo " Esegui: sudo apt-get update && sudo apt-get install -y whiptail"
+  echo "Error: whiptail is not installed."
+  echo "Install it with: sudo apt-get update && sudo apt-get install -y whiptail"
   exit 1
 fi
 
-# Creazione directory di config se assente
+# Create config directory if absent
 mkdir -p "$CONFIG_DIR"
 
 # -------------------------------------------------------------------
-# 1) Definizione delle app 'builtin'
+# 1) Built-in application catalog
 # -------------------------------------------------------------------
 declare -A APP_NAME=(
-  [lmms]="LMMS (DAW pattern-based)"
-  [rosegarden]="Rosegarden (MIDI + partitura)"
-  [ardour]="Ardour (DAW professionale)"
-  [qtractor]="Qtractor (JACK-centric DAW)"
-  [muse]="MusE (sequencer + notazione)"
-  [musescore3]="MuseScore (notazione musicale)"
-  [tuxguitar]="TuxGuitar (tablature editor)"
-  [hydrogen]="Hydrogen (drum machine)"
-  [sooperlooper]="SooperLooper (live looper)"
-  [giada]="Giada (groovebox live)"
-  [audacity]="Audacity (editing audio)"
-  [mixxx]="Mixxx (DJ software)"
-  [calf-plugins]="Calf Plugins (FX LV2)"
-  [carla]="Carla (host VST2/VST3/LV2)"
-  [guitarix]="Guitarix (amp simulator)"
-  [rakarrack]="Rakarrack (multi-FX chitarra)"
-  [jackd2]="JACK2 (audio server realtime)"
-  [pipewire]="PipeWire (audio moderno)"
-  [pulseaudio]="PulseAudio"
-  [qjackctl]="QjackCtl (GUI per JACK)"
-  [patchage]="Patchage (patchbay LV2/JACK)"
-  [cadence]="Cadence (suite KXStudio)"
-  [zynaddsubfx]="ZynAddSubFX (synth avanzato)"
-  [yoshimi]="Yoshimi (fork ZynAddSubFX)"
-  [fluidsynth]="FluidSynth (soundfont)"
-  [qsynth]="Qsynth (GUI FluidSynth)"
-  [fluid-soundfont-gm]="SoundFont GM per FluidSynth"
-  [helm]="Helm (synth Qt moderno)"
-  [vlc]="VLC (player multiformato)"
-  [audacious]="Audacious (player leggero)"
-  [clementine]="Clementine (music player)"
-  [sox]="SoX (CLI audio toolkit)"
-  [ffmpeg]="FFmpeg (codec & streaming)"
-  [ecasound]="Ecasound (multi-traccia CLI)"
-  [alsa-utils]="ALSA Utils (mixer e MIDI CLI)"
-  [a2jmidid]="a2jmidid (ALSA⇄JACK MIDI bridge)"
-  [aconnectgui]="aconnectgui (MIDI patchbay GUI)"
-  [kmidimon]="KmidiMon (MIDI monitor GUI)"
+  [ardour]="Ardour – Professional DAW"
+  [lmms]="LMMS – Pattern-based music production"
+  [qtractor]="Qtractor – JACK-centric DAW"
+  [rosegarden]="Rosegarden – MIDI & notation"
+  [musescore]="MuseScore – Music notation"
+  [hydrogen]="Hydrogen – Advanced drum machine"
+  [carla]="Carla – Audio plugin host (VST/LV2)"
+  [sooperlooper]="SooperLooper – Live looping"
+  [audacity]="Audacity – Audio editor"
+  [mixxx]="Mixxx – DJ mixing software"
+  [jackd2]="JACK2 – Low-latency audio server"
+  [pipewire]="PipeWire – Modern audio server"
+  [pulseaudio]="PulseAudio – Sound server"
+  [qjackctl]="QjackCtl – GUI for JACK"
+  [patchage]="Patchage – LV2/JACK patch bay"
+  [cadence]="Cadence – KXStudio toolsuite"
+  [fluidsynth]="FluidSynth – SoundFont synthesizer"
+  [qsynth]="Qsynth – GUI for FluidSynth"
+  [ffmpeg]="FFmpeg – Multimedia framework"
+  [sox]="SoX – Sound processing toolkit"
+  [ecasound]="Ecasound – Multitrack audio recorder"
+  [alsa-utils]="ALSA Utils – Mixer & MIDI tools"
 )
 
 declare -A APP_CMD=(
-  [lmms]="lmms"
-  [rosegarden]="rosegarden"
   [ardour]="ardour"
+  [lmms]="lmms"
   [qtractor]="qtractor"
-  [muse]="muse"
-  [musescore3]="musescore3"
-  [tuxguitar]="tuxguitar"
+  [rosegarden]="rosegarden"
+  [musescore]="musescore"
   [hydrogen]="hydrogen"
+  [carla]="carla"
   [sooperlooper]="sooperlooper"
-  [giada]="giada"
   [audacity]="audacity"
   [mixxx]="mixxx"
-  [carla]="carla"
-  [guitarix]="guitarix"
-  [rakarrack]="rakarrack"
+  [jackd2]="jackd"
+  [pipewire]="pipewire"
+  [pulseaudio]="pulseaudio"
   [qjackctl]="qjackctl"
   [patchage]="patchage"
   [cadence]="cadence"
-  [zynaddsubfx]="zynaddsubfx"
-  [yoshimi]="yoshimi"
   [fluidsynth]="fluidsynth"
   [qsynth]="qsynth"
-  [helm]="helm"
-  [vlc]="vlc"
-  [audacious]="audacious"
-  [clementine]="clementine"
-  [sox]="sox"
   [ffmpeg]="ffmpeg"
+  [sox]="sox"
   [ecasound]="ecasound"
-  [alsamixer]="alsamixer"
-  [a2jmidid]="a2jmidid"
-  [aconnectgui]="aconnectgui"
-  [kmidimon]="kmidimon"
+  [alsa-utils]="alsamixer"
 )
 
 # -------------------------------------------------------------------
-# 2) Caricamento delle custom apps utente
+# 2) Load user-defined custom apps
 # -------------------------------------------------------------------
 if [[ -f "$CUSTOM_APPS_FILE" ]]; then
   while IFS='|' read -r id name pkg cmd; do
@@ -124,48 +97,48 @@ if [[ -f "$CUSTOM_APPS_FILE" ]]; then
 fi
 
 # -------------------------------------------------------------------
-# 3) Funzioni di utilità
+# 3) Utility functions
 # -------------------------------------------------------------------
 
-# Restituisce vero se il pacchetto è installato
+# Check if APT package is installed
 is_installed() {
   dpkg-query -W -f='${Status}' "$1" 2>/dev/null \
     | grep -q "install ok installed"
 }
 
-# Installazione pacchetti (aggiorna cache una volta)
+# Install packages (update cache once)
 install_pkgs() {
   sudo apt-get update -qq
   sudo apt-get install -y "$@"
 }
 
-# Rimozione mantenendo config
+# Remove packages (keep configuration)
 remove_pkgs() {
   sudo apt-get remove -y "$@"
 }
 
-# Rimozione con purge (config inclusa)
+# Purge packages (delete configuration)
 purge_pkgs() {
   sudo apt-get purge -y "$@"
 }
 
 # -------------------------------------------------------------------
-# 4) Definizione dei menu whiptail
+# 4) Whiptail menu definitions
 # -------------------------------------------------------------------
 
-# Menu principale
+# Main menu
 main_menu() {
   whiptail --clear --title "StudioBand v$VERSION" \
-    --menu "Seleziona un’azione:" 15 60 6 \
-    1 "Installa / Rimuovi applicazioni" \
-    2 "Visualizza stato applicazioni" \
-    3 "Lancia applicazioni" \
-    4 "Aggiungi custom app" \
+    --menu "Select an action:" 16 60 6 \
+    1 "Install / Remove Applications" \
+    2 "Show Application Status" \
+    3 "Launch Applications" \
+    4 "Add Custom Application" \
     5 "Info / Help" \
-    6 "Esci" 3>&1 1>&2 2>&3
+    6 "Exit" 3>&1 1>&2 2>&3
 }
 
-# Checklist install-remove
+# Install / Remove checklist
 manage_menu() {
   local items=()
   for id in "${!APP_NAME[@]}"; do
@@ -175,96 +148,106 @@ manage_menu() {
       items+=("$id" "${APP_NAME[$id]}" "OFF")
     fi
   done
-  whiptail --clear --title "Installa / Rimuovi" \
-    --checklist "OFF = Installa, ON = Rimuovi" 20 70 15 \
+  whiptail --clear --title "Install / Remove" \
+    --checklist "OFF = install, ON = remove" 20 70 15 \
     "${items[@]}" 3>&1 1>&2 2>&3
 }
 
-# Scegli tra remove o purge
+# Choose removal mode: remove or purge
 removal_mode_menu() {
-  whiptail --clear --title "Modalità Rimozione" \
-    --menu "Remove: mantieni config  |  Purge: elimina config" \
+  whiptail --clear --title "Removal Mode" \
+    --menu "1 = remove (keep config) | 2 = purge (delete config)" \
     10 50 2 \
     1 "remove" \
     2 "purge" 3>&1 1>&2 2>&3
 }
 
-# Messaggio stato
+# Show installed vs not installed
 status_menu() {
-  local out=""
+  local output=""
   for id in "${!APP_NAME[@]}"; do
     if is_installed "$id"; then
-      out+="✔ ${APP_NAME[$id]}\n"
+      output+="✔ ${APP_NAME[$id]}\n"
     else
-      out+="✖ ${APP_NAME[$id]}\n"
+      output+="✖ ${APP_NAME[$id]}\n"
     fi
   done
-  whiptail --clear --title "Stato Applicazioni" \
-    --msgbox "$out" 20 60
+  whiptail --clear --title "Application Status" \
+    --msgbox "$output" 20 60
 }
 
-# Checklist per lancio applicazioni
+# Launch one or more installed apps
 launch_menu() {
   local items=()
   for id in "${!APP_NAME[@]}"; do
     is_installed "$id" && items+=("$id" "${APP_NAME[$id]}" "OFF")
   done
-  local sel
-  sel=$(whiptail --clear --title "Lancia Applicazioni" \
-    --checklist "Seleziona e premi Invio:" 20 70 15 \
+
+  local selected
+  selected=$(whiptail --clear --title "Launch Applications" \
+    --checklist "Select apps to launch:" \
+    20 70 15 \
     "${items[@]}" 3>&1 1>&2 2>&3) || return
 
-  for id in $sel; do
+  for id in $selected; do
     setsid "${APP_CMD[$id]}" &>/dev/null &
   done
 }
 
-# Aggiungi custom app
+# Add a custom application
 add_custom_app() {
   local id name pkg cmd
-  id=$(whiptail --inputbox "ID univoco (es. mydrum):" 8 50 3>&1 1>&2 2>&3) || return
-  name=$(whiptail --inputbox "Nome descrittivo:" 8 50 3>&1 1>&2 2>&3)    || return
-  pkg=$(whiptail --inputbox "Pacchetto apt:" 8 50 3>&1 1>&2 2>&3)       || return
-  cmd=$(whiptail --inputbox "Comando di avvio:" 8 50 3>&1 1>&2 2>&3)    || return
+  id=$(whiptail --inputbox "Enter unique ID (e.g. mydrum):" 8 50 3>&1 1>&2 2>&3)    || return
+  name=$(whiptail --inputbox "Enter descriptive name:" 8 50 3>&1 1>&2 2>&3)         || return
+  pkg=$(whiptail --inputbox "Enter APT package name:" 8 50 3>&1 1>&2 2>&3)          || return
+  cmd=$(whiptail --inputbox "Enter launch command:" 8 50 3>&1 1>&2 2>&3)             || return
 
   echo "$id|$name|$pkg|$cmd" >>"$CUSTOM_APPS_FILE"
-  whiptail --msgbox "Custom app aggiunta!" 8 50
-  exec "$0"
+  whiptail --msgbox "Custom application added successfully!" 8 50
+  exec "$0"  # Reload script to include new entry
 }
 
-# Info / Help
+# Info / Help screen
 help_menu() {
   whiptail --clear --title "Info / Help" --msgbox "\
 StudioBand v$VERSION
 
-Gestisci DAW, synth, player e utility:
- • Installa / Rimuovi (keep/purge)
- • Visualizza stato
- • Lancia più app da menu
- • Aggiungi custom apps
+Manage your DAWs, synths, players & audio utilities:
+ • Install / Remove (remove or purge)
+ • Show status of all apps
+ • Launch multiple apps from menu
+ • Add custom applications
 
-Config file: $CUSTOM_APPS_FILE
+Config directory: $CONFIG_DIR
+Custom list file: $CUSTOM_APPS_FILE
 
-© 2025 StudioBand Team" 16 60
+© 2025 Luca Bocaletto
+Licensed under GPLv3" 16 60
 }
 
 # -------------------------------------------------------------------
-# 5) Loop principale
+# 5) Main program loop
 # -------------------------------------------------------------------
 while true; do
   case "$(main_menu)" in
     1)
-      mapfile -t sel < <(manage_menu)
+      mapfile -t selection < <(manage_menu)
       to_install=() to_remove=()
-      for id in "${sel[@]}"; do
-        if is_installed "$id"; then to_remove+=("$id")
-        else                      to_install+=("$id"); fi
+      for id in "${selection[@]}"; do
+        if is_installed "$id"; then
+          to_remove+=("$id")
+        else
+          to_install+=("$id")
+        fi
       done
 
       if ((${#to_remove[@]})); then
         mode=$(removal_mode_menu)
-        if [[ "$mode" == "2" ]]; then purge_pkgs "${to_remove[@]}"
-        else                           remove_pkgs "${to_remove[@]}"; fi
+        if [[ "$mode" == "2" ]]; then
+          purge_pkgs "${to_remove[@]}"
+        else
+          remove_pkgs "${to_remove[@]}"
+        fi
       fi
 
       if ((${#to_install[@]})); then
@@ -281,4 +264,4 @@ while true; do
 done
 
 clear
-echo "Grazie per aver usato StudioBand v$VERSION. Buona produzione!"
+echo "Thank you for using StudioBand v$VERSION. Happy music making!"
