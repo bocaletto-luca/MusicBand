@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Basic Meta Tags -->
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- SEO Meta Tags -->
+  <title>StudioBand | Terminal-Based Audio App Manager for Debian & Ubuntu</title>
+  <meta name="description" content="StudioBand is a professional, terminal-based manager for audio/music production apps on Debian & Ubuntu. Install, remove, inspect, and launch DAWs, synths, players & utilities—all in one Bash script.">
+  <meta name="keywords" content="StudioBand, audio manager, music production, DAW manager, Bash script, whiptail, Debian, Ubuntu, application manager">
+  <link rel="canonical" href="https://bocaletto-luca.github.io/StudioBand/">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="StudioBand | Terminal-Based Audio App Manager">
+  <meta property="og:description" content="Manage all your audio/music apps from a single Bash script on Debian & Ubuntu.">
+  <meta property="og:url"         content="https://bocaletto-luca.github.io/StudioBand/">
+  <meta property="og:image"       content="https://raw.githubusercontent.com/bocaletto-luca/StudioBand/main/assets/studioband-logo.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="StudioBand | Terminal-Based Audio App Manager">
+  <meta name="twitter:description" content="Install, remove, inspect & launch DAWs, synths & utilities from one script on Debian/Ubuntu.">
+  <meta name="twitter:image"       content="https://raw.githubusercontent.com/bocaletto-luca/StudioBand/main/assets/studioband-logo.png">
+
+  <!-- Favicon -->
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+
+  <!-- Styles (optional) -->
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; margin:0; padding:0; color:#333; }
+    header, section, footer { padding: 2rem; max-width: 960px; margin: auto; }
+    header { background: #222; color: #fff; text-align: center; }
+    nav a { margin: 0 1rem; color: #fff; text-decoration: none; }
+    h1 { margin-bottom: 0.5rem; }
+    .btn { display: inline-block; margin-top:1rem; padding: 0.75rem 1.5rem; background:#007acc; color:#fff; text-decoration:none; border-radius:4px; }
+    section { border-bottom: 1px solid #eaeaea; }
+    section:last-child { border-bottom: none; }
+    ul { margin: 1rem 0; padding-left: 1.25rem; }
+    code, pre { background: #f4f4f4; padding: 0.2rem 0.4rem; border-radius: 3px; }
+    footer { text-align:center; font-size:0.9rem; color:#666; }
+    @media (max-width:600px) { nav { display:block; margin-bottom:1rem; } }
+  </style>
+</head>
+<body>
+
+  <!-- Header / Hero -->
+  <header>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#requirements">Requirements</a>
+      <a href="#installation">Installation</a>
+      <a href="#usage">Usage</a>
+      <a href="#contributing">Contributing</a>
+      <a href="#license">License</a>
+    </nav>
+    <h1>StudioBand</h1>
+    <p>Terminal-Based Audio & Music Production App Manager for Debian & Ubuntu</p>
+    <a class="btn" href="#installation">Get Started</a>
+  </header>
+
+  <main>
+    <!-- Features -->
+    <section id="features">
+      <h2>Features</h2>
+      <ul>
+        <li>Pre-configured catalog of popular audio/music apps (DAWs, synths, players, JACK/PipeWire tools).</li>
+        <li>Instant status overview: ✔️ installed vs. ✖️ not installed.</li>
+        <li>One-step <code>install</code> or <code>remove</code>; choose between <code>remove</code> (keep config) or <code>purge</code> (wipe config).</li>
+        <li>Launch multiple installed apps in parallel from a checklist menu.</li>
+        <li>Extendable “custom apps” system—add any APT package + launch command.</li>
+        <li>Persistent settings under <code>~/.studioband/</code> for future sessions.</li>
+      </ul>
+    </section>
+
+    <!-- Requirements -->
+    <section id="requirements">
+      <h2>Requirements</h2>
+      <ul>
+        <li>Debian or Ubuntu (and derivatives).</li>
+        <li>Bash 4.x or newer.</li>
+        <li><code>whiptail</code> (install with <code>sudo apt-get install -y whiptail</code>).</li>
+        <li>Sudo privileges.</li>
+      </ul>
+    </section>
+
+    <!-- Installation -->
+    <section id="installation">
+      <h2>Installation</h2>
+      <pre><code># 1. Clone the repository
+git clone https://github.com/bocaletto-luca/StudioBand.git
+cd StudioBand
+
+# 2. Make the script executable
+chmod +x StudioBand.sh
+
+# 3. Install whiptail (if needed)
+sudo apt-get update
+sudo apt-get install -y whiptail
+
+# 4. Launch StudioBand
+./StudioBand.sh
+</code></pre>
+    </section>
+
+    <!-- Usage -->
+    <section id="usage">
+      <h2>Usage</h2>
+      <p>After launching <code>./StudioBand.sh</code>, you’ll see a main menu with the following options:</p>
+      <ol>
+        <li><strong>Install / Remove applications:</strong>  
+          Select apps to install (OFF) or remove (ON).  
+          If removing, choose <code>remove</code> (preserve config) or <code>purge</code> (delete config).</li>
+        <li><strong>Show application status:</strong>  
+          View a ✔️/✖️ list of installed vs. not installed.</li>
+        <li><strong>Launch applications:</strong>  
+          Select one or more installed apps to start in the background.</li>
+        <li><strong>Add custom app:</strong>  
+          Define an ID, descriptive name, APT package and launch command.  
+          Entries are saved to <code>~/.studioband/apps.custom</code>.</li>
+        <li><strong>Info / Help:</strong>  
+          Displays version, config file location and credits.</li>
+        <li><strong>Exit:</strong>  
+          Close StudioBand cleanly.</li>
+      </ol>
+    </section>
+
+    <!-- Adding Custom Apps -->
+    <section id="custom-apps">
+      <h2>Adding Custom Apps</h2>
+      <p>To include an application not in the built-in list:</p>
+      <ol>
+        <li>Select <strong>Add custom app</strong> from the main menu.</li>
+        <li>Enter a unique ID (e.g., <code>mydrum</code>), a descriptive name, the APT package and the launch command.</li>
+        <li>StudioBand appends your entry to <code>~/.studioband/apps.custom</code> and reloads—your new app appears immediately.</li>
+      </ol>
+      <p>Download the latest script directly:  
+        <a href="https://raw.githubusercontent.com/bocaletto-luca/StudioBand/main/StudioBand.sh" target="_blank">StudioBand.sh (raw)</a>
+      </p>
+    </section>
+
+    <!-- Customization -->
+    <section id="customization">
+      <h2>Customization</h2>
+      <p>You can tailor StudioBand by editing the built-in app arrays at the top of <code>StudioBand.sh</code>:</p>
+      <ul>
+        <li><code>APP_NAME</code> – Human-readable labels.</li>
+        <li><code>APP_CMD</code> – Commands to launch each app.</li>
+      </ul>
+      <p>Your custom entries are stored in <code>~/.studioband/apps.custom</code>. Back up or restore your setup by copying the entire <code>~/.studioband/</code> folder.</p>
+    </section>
+
+    <!-- Contributing -->
+    <section id="contributing">
+      <h2>Contributing</h2>
+      <p>Contributions are welcome! To help improve StudioBand:</p>
+      <ol>
+        <li>Fork the repository on GitHub:  
+          <a href="https://github.com/bocaletto-luca/StudioBand" target="_blank">github.com/bocaletto-luca/StudioBand</a>
+        </li>
+        <li>Create a feature branch: <code>git checkout -b feature-name</code></li>
+        <li>Commit your changes: <code>git commit -m "Add feature"</code></li>
+        <li>Push to your fork: <code>git push origin feature-name</code></li>
+        <li>Open a Pull Request describing your enhancements.</li>
+      </ol>
+    </section>
+
+    <!-- License -->
+    <section id="license">
+      <h2>License</h2>
+      <p>StudioBand is released under the <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank">GNU General Public License v3.0</a>.</p>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 Luca Bocaletto. Hosted on <a href="https://github.com/bocaletto-luca/StudioBand" target="_blank">GitHub</a>.</p>
+  </footer>
+
+</body>
+</html>
+```
