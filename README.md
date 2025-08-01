@@ -1,101 +1,116 @@
 # StudioBand
+#### Author: Bocaletto Luca
 
-StudioBand è uno script Bash che ho sviluppato per gestire in modo semplice e professionale tutte le applicazioni audio e music production su Debian/Ubuntu. Con un’interfaccia testuale basata su whiptail, posso installare, rimuovere, visualizzare lo stato e lanciare i miei software preferiti in pochi secondi.
+StudioBand is a professional, terminal-based application manager for audio and music production on Debian/Ubuntu. With a clean ASCII UI powered by `whiptail`, you can install, remove (with “keep config” or full purge), inspect, and launch your favorite DAWs, synths, players and CLI utilities—all from one script.
 
----
+## Table of Contents
 
-## Caratteristiche
-
-- Catalogazione di DAW, synth, player e utility audio  
-- Verifica immediata dello stato di installazione  
-- Installazione e rimozione selettiva con scelta “keep config” o “purge”  
-- Avvio multiplo di applicazioni direttamente dal menu  
-- Possibilità di aggiungere applicazioni personalizzate (custom apps)  
-- Configurazione persistente in `~/.studioband/`  
-
----
-
-## Requisiti
-
-- Sistema operativo Debian o Ubuntu  
-- Bash (versione 4.x o superiore)  
-- whiptail (`sudo apt-get install -y whiptail`)  
-- Privilegi sudo  
+- [Features](#features)  
+- [Requirements](#requirements)  
+- [Installation](#installation)  
+- [Usage](#usage)  
+- [Adding Custom Apps](#adding-custom-apps)  
+- [Customization](#customization)  
+- [Contributing](#contributing)  
+- [License](#license)  
 
 ---
 
-## Installazione
+## Features
 
-1. Clono il repository sul mio sistema  
-   ```bash
-   git clone https://github.com/bocaletto-luca/StudioBand.git
-   cd StudioBand
-   ```
-
-2. Rendo eseguibile lo script  
-   ```bash
-   chmod +x StudioBand.sh
-   ```
-
-3. Mi assicuro che whiptail sia installato  
-   ```bash
-   sudo apt-get update
-   sudo apt-get install -y whiptail
-   ```
-
-4. Avvio StudioBand  
-   ```bash
-   ./StudioBand.sh
-   ```
+- Pre-mapped catalog of popular audio/music apps (DAWs, synths, players, JACK/PipeWire tools)  
+- Instant status overview: installed vs not installed  
+- One-step install or remove; choose between `remove` (preserve config) or `purge` (wipe config)  
+- Launch multiple installed apps in parallel from a checklist menu  
+- Extendable “custom apps” system—add any APT package + launch command  
+- Persist settings and custom entries under `~/.studioband/` for future sessions  
 
 ---
 
-## Uso
+## Requirements
 
-All’avvio dello script compare un menu principale in cui posso scegliere:
-
-1. **Installa / Rimuovi applicazioni** – Seleziono le app da gestire e decido se installare, rimuovere (mantendo i file di configurazione) o eseguire un purge completo.  
-2. **Visualizza stato applicazioni** – Controllo in un colpo d’occhio quali software sono installati.  
-3. **Lancia applicazioni** – Scelgo più programmi da avviare contemporaneamente.  
-4. **Aggiungi custom app** – Inserisco nuove app con ID, nome, pacchetto APT e comando di lancio.  
-5. **Info / Help** – Informazioni sulla versione e percorso dei file di configurazione.  
+- Debian or Ubuntu (and derivatives)  
+- Bash 4.x or newer  
+- `whiptail` (install via `sudo apt-get install -y whiptail`)  
+- Sudo privileges  
 
 ---
 
-## Aggiunta di Custom App
+## Installation
 
-Per includere un’applicazione non presente nella lista predefinita:
+```bash
+# 1. Clone this repository
+git clone https://github.com/bocaletto-luca/StudioBand.git
+cd StudioBand
 
-1. Seleziono “Aggiungi custom app” dal menu principale  
-2. Inserisco un ID univoco (es. `mydrum`)  
-3. Definisco il nome descrittivo  
-4. Specifico il pacchetto APT da installare  
-5. Indico il comando per avviare l’app  
+# 2. Make the script executable
+chmod +x StudioBand.sh
 
-Le informazioni vengono salvate in `~/.studioband/apps.custom` e lanciando di nuovo lo script l’app comparirà automaticamente nei menu.
+# 3. Ensure whiptail is installed
+sudo apt-get update
+sudo apt-get install -y whiptail
 
----
-
-## Personalizzazione
-
-- Il file di configurazione principale si trova in `~/.studioband/`  
-- Posso eseguire backup o ripristino semplice copiando questa cartella  
-- Modificando il codice Bash (dichiarazioni `APP_NAME` e `APP_CMD`) aggiungo o rimuovo app “builtin”  
+# 4. Launch StudioBand
+./StudioBand.sh
+```
 
 ---
 
-## Contribuire
+## Usage
 
-Se vuoi migliorare StudioBand, sei il benvenuto! Ti basta:
+When you run `./StudioBand.sh`, a main menu appears with:
 
-1. Fork del progetto  
-2. Creazione di un branch per la tua feature o correzione  
-3. Apertura di una pull request descrivendo le modifiche  
+1. **Install / Remove applications**  
+   - Check apps to install (OFF) or remove (ON)  
+   - After removal selection, choose `remove` (keep config) or `purge` (delete config)  
 
-Cerco di tenere lo script il più modulare e leggibile possibile, quindi ogni contributo è apprezzato.
+2. **Show application status**  
+   - See a ✔/✖ list of installed vs not installed  
+
+3. **Launch applications**  
+   - Select one or more installed apps to start in background  
+
+4. **Add custom app**  
+   - Define ID, descriptive name, APT package and launch command  
+   - Saved to `~/.studioband/apps.custom` and loaded on next run  
+
+5. **Info / Help**  
+   - Version info and config file location  
+
+6. **Exit**  
 
 ---
 
-## Licenza
+## Adding Custom Apps
 
-Questo progetto è distribuito sotto licenza GPLv3. Per maggiori dettagli, consulta il file [LICENSE](LICENSE).
+1. Choose **Add custom app** from the main menu.  
+2. Enter a unique ID (e.g. `mydrum`), a descriptive name, the APT package name, and the launch command.  
+3. StudioBand appends your entry to `~/.studioband/apps.custom` and reloads—your new app appears immediately in all menus.
+
+---
+
+## Customization
+
+- Built-in apps are defined in the arrays `APP_NAME` and `APP_CMD` at the top of `StudioBand.sh`.  
+- Custom entries live in `~/.studioband/apps.custom`.  
+- Back up or restore your entire setup by copying `~/.studioband/`.
+
+---
+
+## Contributing
+
+I welcome improvements, bug fixes and new app definitions! To contribute:
+
+1. Fork this repo  
+2. Create a feature branch (`git checkout -b feature-name`)  
+3. Commit your changes and push (`git push origin feature-name`)  
+4. Open a Pull Request describing your enhancements  
+
+I’ll review and merge as soon as possible. Thanks for helping make StudioBand better!
+
+---
+
+## License
+
+This project is licensed under the [GNU General Public License v3.0](LICENSE).  
+© 2025 Luca Bocaletto ([@bocaletto-luca](https://github.com/bocaletto-luca))  
